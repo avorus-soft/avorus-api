@@ -1,5 +1,6 @@
 import os
 import asyncio
+import getpass
 
 import contextlib
 
@@ -34,7 +35,30 @@ async def create_user(email: EmailStr, password: str, is_superuser: bool = False
     except UserAlreadyExists:
         print(f'User {email} already exists')
 
-if __name__ == '__main__':
+
+def get_userpass():
+    password = getpass.getpass('Password (can be changed later): ')
+    if password == getpass.getpass('Verify password: '):
+        return password
+    else:
+        print('Passwords do not match!')
+        return get_userpass()
+
+
+async def main():
+    print('Creating system user...')
     username = EmailStr(os.environ.get('API_SYSTEM_USERNAME'))
     password = str(os.environ.get('API_SYSTEM_PASSWORD'))
-    asyncio.run(create_user(username, password, is_superuser=True))
+    try:
+        await create_user(username, password, is_superuser=True)
+    except Exception as e:
+        print(e)
+    print('Please create your admin account')
+    username = input('Email: ')
+    password = get_userpass()
+    await create_user(username, password, is_superuser=True)
+    print('Done!')
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
