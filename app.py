@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from mqtt import mqtt
-from routes import base, calendar, knx
+from routes import base, config, calendar, knx
 from routes.knx import save_event
 
 from db import User, db
@@ -127,7 +127,11 @@ app.include_router(
     prefix='/users',
     tags=['users'],
 )
+
+
 app.include_router(users.router, tags=['users'])
+
+app.include_router(config.router, prefix='/config', tags=['config'])
 
 app.include_router(calendar.router, prefix='/api', tags=['api'])
 
